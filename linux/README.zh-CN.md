@@ -6,7 +6,7 @@
 
 以下命令均在 `linux/` 目录执行（先从仓库根目录运行 `cd linux`）。
 分区读写与恢复见 [Fastboot 路线](../fastboot/README.zh-CN.md)；它通过 Pico 的 BootROM 注入进入。
-在固件 `30110_05.2025031501`、macOS 上实测。
+已在固件 `30110_05.2025031501`、macOS 与 Linux x86_64 主机上实测。
 
 ## 目录
 
@@ -102,6 +102,7 @@ backups/zve10-raw-emmc-<时间戳>/
 - [备份方法](docs/backup-method.zh-CN.md)
 - [校验](docs/verification.zh-CN.md)
 - [BootROM dump](docs/bootrom-dump.zh-CN.md)
+- [Linux 实机验证记录](docs/hardware-validation.zh-CN.md)
 - [Fastboot / eMMC](../fastboot/README.zh-CN.md)
 
 与 Sony 无关，也未获 Sony 认可。

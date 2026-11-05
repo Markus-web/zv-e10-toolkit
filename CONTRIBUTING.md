@@ -13,6 +13,11 @@ From the repository root, with Python 3.10+, make and clang:
 
 ```sh
 make -C fastboot test PYTHON=python3
+make -C fastboot check PYTHON=python3
+
+cd linux
+.venv/bin/python -m unittest discover -s tests -v
+sh -n scripts/*.sh
 ```
 
 This checks release payload hashes and capabilities, C partition/eMMC/fastboot
@@ -21,7 +26,9 @@ and the Linux slice-report-to-recovery preparation flow. It also checks that
 invalid backup data stops recovery before any device access. Tests need no
 camera, Pico, Sony-PMCA-RE checkout or Python USB packages.
 
-测试不连接设备，不写入相机，也不需要安装 Sony-PMCA-RE 或 Python USB 包。
+The Linux test suite and shell syntax gate are also offline. Hardware validation records belong in the relevant route's `docs/` directory and must omit private device data.
+
+测试不连接设备，不写入相机，也不需要安装 Sony-PMCA-RE 或 Python USB 包。实机验证记录放在对应路线的 `docs/` 目录，且不得包含私有设备数据。
 
 ## Rebuild the published pair / 重建正式配对
 

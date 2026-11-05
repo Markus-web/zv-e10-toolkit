@@ -6,7 +6,7 @@ This directory contains host tools for the ZV-E10 USB service interface: termina
 
 Run the commands below from `linux/` (`cd linux` from the repository root).
 See the [fastboot route](../fastboot/README.md) for partition reads, writes and recovery; it is entered through Pico BootROM injection.
-Tested on firmware `30110_05.2025031501` with macOS.
+Tested on firmware `30110_05.2025031501` with macOS and Linux x86_64 hosts.
 
 ## Layout
 
@@ -110,6 +110,7 @@ disk and hashed again before being renamed into place.
 - [Backup method](docs/backup-method.md)
 - [Verification](docs/verification.md)
 - [BootROM dump](docs/bootrom-dump.md)
+- [Linux hardware validation record](docs/hardware-validation.md)
 - [Fastboot / eMMC](../fastboot/README.md)
 
 Not affiliated with or endorsed by Sony.

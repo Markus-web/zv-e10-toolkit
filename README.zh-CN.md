@@ -54,7 +54,7 @@ fastboot/                    Fastboot 工具（BootROM 注入启动）
 
 ## 当前范围
 
-- 现有文档的实机验证对象是 ZV-E10、固件 `30110_05.2025031501`，主机为 macOS。
+- 现有实机验证对象是 ZV-E10、固件 `30110_05.2025031501`。Fastboot 记录使用 macOS；Linux 服务路线也已在 Linux x86_64 上通过直连 USB-C 验证。
 - fastboot 分区读写、sparse、回读校验和恢复已有实机记录；约 4 分钟的自动复位不再中断 fastboot 会话，fastboot 会一直保持到主动重启或断电，大分区操作可一次完成。
 - 恢复脚本支持 16 个用户分区，不处理 boot0/boot1、分区表或硬件故障。
 - Linux 路线读取的 BootROM 范围为 24 KiB；裸机 `peek` 允许的地址范围见[内存读取说明](fastboot/docs/exploration.zh-CN.md)。

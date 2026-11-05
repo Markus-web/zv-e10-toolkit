@@ -55,7 +55,7 @@ See [development and validation](CONTRIBUTING.md) for building and testing.
 
 ## Current scope
 
-- Existing hardware validation covers ZV-E10 firmware `30110_05.2025031501` with macOS hosts.
+- Existing hardware validation covers ZV-E10 firmware `30110_05.2025031501`. Fastboot records use macOS; the Linux service route is also validated on Linux x86_64 over direct USB-C.
 - Fastboot partition reads, writes, sparse images, readback and partition recovery have hardware validation records. The approximately four-minute automatic reset no longer interrupts fastboot sessions; fastboot remains available until reboot or power-off, so large partition operations can run in one session.
 - The recovery script supports 16 user partitions; it does not handle boot0/boot1, the partition table or hardware faults.
 - The Linux route reads a 24 KiB BootROM range. See [memory read documentation](fastboot/docs/exploration.md) for the permitted bare-metal `peek` ranges.
