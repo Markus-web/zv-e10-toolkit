@@ -44,6 +44,13 @@ INVENTORY_ROOTS = (
 )
 CHUNK = 32768
 COMMAND_TIMEOUT = 120
+INVENTORY_SENTINEL = "__ZVE10_INVENTORY_DONE__"
+
+
+class CommandFailure(RuntimeError):
+    def __init__(self, label: str, result: dict):
+        super().__init__("%s failed with exit %s" % (label, result["exit_code"]))
+        self.result = result
 
 
 def run(dev, label: str, text: str, timeout: float = COMMAND_TIMEOUT) -> dict:
@@ -51,7 +58,7 @@ def run(dev, label: str, text: str, timeout: float = COMMAND_TIMEOUT) -> dict:
     if result["exit_code"] != 0 and not result["output"].strip():
         # Some busybox applets return non-zero after producing useful output;
         # an empty body is the reliable failure signal here.
-        raise RuntimeError("%s failed with exit %s" % (label, result["exit_code"]))
+        raise CommandFailure(label, result)
     return result
 
 
@@ -108,6 +115,22 @@ def transfer(dev, camera_path: str, size: int, destination: Path) -> str:
     return digest.hexdigest()
 
 
+def fallback_inventory_command(root: str) -> str:
+    return (
+        "is_mount(){ while read dev mnt rest; do [ \"$mnt\" = \"$1\" ] && return 0; "
+        "done < /proc/mounts; return 1; }; "
+        "walk(){ [ \"$2\" -le 64 ] || return 70; "
+        "for p in \"$1\"/* \"$1\"/.[!.]* \"$1\"/..?*; do "
+        "[ -e \"$p\" ] || continue; [ -L \"$p\" ] && continue; "
+        "if [ -d \"$p\" ]; then is_mount \"$p\" || "
+        "walk \"$p\" $(( $2 + 1 )) || return $?; "
+        "elif [ -f \"$p\" ]; then printf '%%s\\n' \"$p\"; fi; "
+        "done; }; root=%s; { [ -d \"$root\" ] && [ ! -L \"$root\" ] && "
+        "walk \"$root\" 0 && printf '%s\\n'; } 2>/dev/null"
+        % (common.shquote(root), INVENTORY_SENTINEL)
+    )
+
+
 def inventory(dev, roots) -> tuple[list[str], list[dict]]:
     files: list[str] = []
     errors: list[dict] = []
@@ -122,14 +145,38 @@ def inventory(dev, roots) -> tuple[list[str], list[dict]]:
                     "inventory",
                     "busybox find %s -xdev -type f -print 2>/dev/null" % common.shquote(root),
                 )
-                candidates = [
-                    line.strip()
-                    for line in result["output"].splitlines()
-                    if line.strip().startswith("/")
-                ]
-            except Exception as exc:  # noqa: BLE001
-                errors.append({"root": root, "error": repr(exc)})
+            except CommandFailure as find_exc:
+                if find_exc.result["exit_code"] != 127:
+                    errors.append({"root": root, "error": repr(find_exc)})
+                    continue
+                try:
+                    result = run(dev, "inventory-fallback", fallback_inventory_command(root))
+                except Exception as fallback_exc:  # noqa: BLE001
+                    errors.append({
+                        "root": root,
+                        "error": "find: %r; shell fallback: %r" % (find_exc, fallback_exc),
+                    })
+                    continue
+                lines = result["output"].splitlines()
+                while lines and not lines[-1].strip():
+                    lines.pop()
+                sentinel_ok = bool(lines and lines[-1].strip() == INVENTORY_SENTINEL)
+                if result["exit_code"] != 0 or not sentinel_ok:
+                    errors.append({
+                        "root": root,
+                        "error": "shell fallback incomplete (exit %s, sentinel %s, tail %r)"
+                        % (result["exit_code"], sentinel_ok, lines[-3:]),
+                    })
+                    continue
+                result = {**result, "output": "\n".join(lines[:-1])}
+            except Exception as find_exc:  # noqa: BLE001
+                errors.append({"root": root, "error": repr(find_exc)})
                 continue
+            candidates = [
+                line.strip()
+                for line in result["output"].splitlines()
+                if line.strip().startswith("/")
+            ]
         for path in candidates:
             if path not in seen:
                 seen.add(path)
@@ -207,7 +254,9 @@ def backup(dev, out: Path, phase: str, *, max_file_bytes: int, max_files: int,
                 raise RuntimeError("hash mismatch for " + camera_path)
         except Exception as exc:  # noqa: BLE001
             record["error"] = repr(exc)
-    result["completed"] = all("error" not in item for item in result["files"])
+    result["completed"] = not result["inventory_errors"] and all(
+        "error" not in item for item in result["files"]
+    )
     return result
 
 
@@ -221,6 +270,10 @@ def write_report(out: Path, result: dict) -> None:
     ]
     if "inventory" in result:
         lines += ["Inventory entries: %d" % len(result["inventory"])]
+    if result.get("inventory_errors"):
+        lines += ["", "## Inventory errors", ""]
+        for item in result["inventory_errors"]:
+            lines.append("- `%s`: %s" % (item["root"], item["error"]))
     lines += [
         "",
         "| file | size | match |",

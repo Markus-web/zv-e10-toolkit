@@ -79,6 +79,8 @@ backups/zve10-raw-emmc-<时间戳>/
 
 - 本目录的 Python 工具没有镜像写回或分区恢复功能；`../fastboot/` 提供分区恢复
   （见其 README）。
+- 文件清单会优先使用 `busybox find`；若固件未包含 BusyBox `find` applet，
+  则回退到递归 shell 内建命令。
 - 原始镜像是 Linux 驱动暴露的内容，不是物理芯片转储；不含 RPMB、OTP/eFuse 或隐藏区域。
 - 不是原子快照：rw 分区在两遍读取之间可能变化。两份镜像都会保留，差异如实报告。
 - 要求相机能启动到接受服务会话的程度。

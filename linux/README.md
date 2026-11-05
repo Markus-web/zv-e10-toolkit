@@ -82,6 +82,8 @@ disk and hashed again before being renamed into place.
 
 - The Python tools here do not write back images or restore partitions; `../fastboot/`
   does have a verified partition-level restore (see its README).
+- File inventory uses `busybox find` when available and falls back to recursive
+  shell builtins on firmware builds that omit the BusyBox `find` applet.
 - Raw images are what the Linux driver exposes, not a physical chip dump; no
   RPMB, OTP/eFuse, or hidden areas.
 - Not an atomic snapshot: read-write partitions can change between the two
