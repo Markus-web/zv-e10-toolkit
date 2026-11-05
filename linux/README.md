@@ -24,6 +24,7 @@ docs/                     Operation guides
 |---|---|---|
 | `host/zve10_backup_raw.py` | Read the Linux-visible user area and B0/B1 twice; save raw images and hashes | None |
 | `host/zve10_backup_files.py` | Copy selected ordinary files over the service terminal | None |
+| `host/zve10_runtime_snapshot.py` | Capture volatile kernel, module, interrupt, mount, device-class and log state | None |
 | `host/zve10_get_file.py` | Read one explicit file through FileControl READ | None |
 | `host/zve10_verify.py` | Verify manifests, `SHA256SUMS`, and partition slices offline | None |
 | `host/zve10_terminal_server.py` + client | Service shell; read-only allow-list by default | None by default; write mode optional |
@@ -46,6 +47,7 @@ Requires Python 3.10+, `libusb`, the camera in USB mass-storage mode, and about
 ```sh
 ./scripts/run_raw_backup.sh
 ./scripts/run_file_backup.sh --phase critical
+./scripts/run_runtime_snapshot.sh
 
 .venv/bin/python host/zve10_verify.py manifest \
   --manifest backups/zve10-raw-emmc-*/manifest.json

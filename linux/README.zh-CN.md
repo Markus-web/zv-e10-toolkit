@@ -24,6 +24,7 @@ docs/                     操作说明
 |---|---|---|
 | `host/zve10_backup_raw.py` | 读取内核暴露的用户区和 B0/B1，各读两遍，保存原始镜像和哈希 | 无 |
 | `host/zve10_backup_files.py` | 通过服务终端复制指定普通文件 | 无 |
+| `host/zve10_runtime_snapshot.py` | 采集易失的内核、模块、中断、挂载、设备类和日志状态 | 无 |
 | `host/zve10_get_file.py` | 通过 FileControl READ 读取单个指定文件 | 无 |
 | `host/zve10_verify.py` | 离线校验 manifest、`SHA256SUMS` 和分区切片 | 无 |
 | `host/zve10_terminal_server.py` + 客户端 | 服务 shell；默认只读白名单 | 默认无；可选写模式 |
@@ -44,6 +45,7 @@ docs/                     操作说明
 ```sh
 ./scripts/run_raw_backup.sh
 ./scripts/run_file_backup.sh --phase critical
+./scripts/run_runtime_snapshot.sh
 
 .venv/bin/python host/zve10_verify.py manifest \
   --manifest backups/zve10-raw-emmc-*/manifest.json
