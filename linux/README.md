@@ -28,6 +28,7 @@ docs/                     Operation guides
 | `host/zve10_hardware_snapshot.py` | Capture deeper procfs/sysfs device topology for emulator comparison | None |
 | `host/zve10_get_file.py` | Read one explicit file through FileControl READ | None |
 | `host/zve10_verify.py` | Verify manifests, `SHA256SUMS`, and partition slices offline | None |
+| `host/zve10_backup_info.py` | Inspect private `Backup.bin` structure without identifiers or property values | None |
 | `host/zve10_terminal_server.py` + client | Service shell; read-only allow-list by default | None by default; write mode optional |
 | `host/zve10_read_file_jiritsu.py` | Optional Jiritsu `GET_FILE` reader | None |
 | `host/zve10_bootrom_dump.py` | Two-pass BootROM read through `/dev/mem` | Temporary helper in `/tmp_bt` tmpfs |
@@ -52,6 +53,7 @@ Requires Python 3.10+, `libusb`, the camera in USB mass-storage mode, and about
 ./scripts/run_hardware_snapshot.sh
 # Isolate a vendor diagnostic surface instead of adding it to the broad pass:
 ./scripts/run_hardware_snapshot.sh --only proc_udm_input
+./scripts/inspect_backup.sh /private/path/Backup.bin
 
 .venv/bin/python host/zve10_verify.py manifest \
   --manifest backups/zve10-raw-emmc-*/manifest.json
@@ -74,6 +76,8 @@ The hardware snapshot runs 111 bounded procfs/sysfs captures by default. A
 further 34 vendor diagnostic files are available through repeatable `--only`
 arguments. They are deliberately excluded from the default pass because an
 individual vendor procfs read can block while camera firmware is busy.
+Cross-model methods and their ZV-E10 validation status are recorded in
+[`docs/cross-camera-research.md`](docs/cross-camera-research.md).
 
 ## Raw backup output
 

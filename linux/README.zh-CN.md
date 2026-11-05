@@ -28,6 +28,7 @@ docs/                     操作说明
 | `host/zve10_hardware_snapshot.py` | 采集用于模拟器对比的更深层 procfs/sysfs 设备拓扑 | 无 |
 | `host/zve10_get_file.py` | 通过 FileControl READ 读取单个指定文件 | 无 |
 | `host/zve10_verify.py` | 离线校验 manifest、`SHA256SUMS` 和分区切片 | 无 |
+| `host/zve10_backup_info.py` | 检查私有 `Backup.bin` 结构，不输出标识符或属性值 | 无 |
 | `host/zve10_terminal_server.py` + 客户端 | 服务 shell；默认只读白名单 | 默认无；可选写模式 |
 | `host/zve10_read_file_jiritsu.py` | 可选的 Jiritsu `GET_FILE` 文件读取 | 无 |
 | `host/zve10_bootrom_dump.py` | 通过 `/dev/mem` 两遍读取 BootROM | `/tmp_bt` tmpfs 中的临时助手 |
@@ -50,6 +51,7 @@ docs/                     操作说明
 ./scripts/run_hardware_snapshot.sh
 # 单独采集厂商诊断接口，而不是把它加入完整采集：
 ./scripts/run_hardware_snapshot.sh --only proc_udm_input
+./scripts/inspect_backup.sh /private/path/Backup.bin
 
 .venv/bin/python host/zve10_verify.py manifest \
   --manifest backups/zve10-raw-emmc-*/manifest.json
@@ -70,6 +72,8 @@ docs/                     操作说明
 
 硬件快照默认运行 111 个有界的 procfs/sysfs 采集。另有 34 个厂商诊断文件可通过可重复的
 `--only` 参数单独采集。它们不在默认采集中，因为相机固件忙碌时，单个厂商 procfs 读取可能阻塞。
+跨机型方法及其在 ZV-E10 上的验证状态见
+[`docs/cross-camera-research.md`](docs/cross-camera-research.md)。
 
 ## 原始备份产物
 
