@@ -16,6 +16,7 @@ class HardwareSnapshotTests(unittest.TestCase):
     def test_optional_commands_do_not_fail_when_surface_is_missing(self):
         self.assertIn("echo MISSING:", snapshot.optional_cat("/proc/example"))
         self.assertIn("echo MISSING:", snapshot.optional_ls("/sys/example"))
+        self.assertIn("ls -laR", snapshot.optional_ls_recursive("/proc/example"))
 
     def test_commands_exclude_mutating_operations(self):
         commands = "\n".join(command for _name, command in snapshot.COMMANDS)
@@ -41,6 +42,28 @@ class HardwareSnapshotTests(unittest.TestCase):
         self.assertTrue(result["completed"])
         self.assertEqual(len(result["commands"]), len(snapshot.COMMANDS))
         self.assertNotIn("raw", result["commands"][0])
+
+    def test_capture_accepts_a_fixed_subset(self):
+        selected = (("one", "busybox cat /proc/one"),)
+        with mock.patch.object(snapshot.common, "command", return_value={
+            "name": "one",
+            "command": selected[0][1],
+            "exit_code": 0,
+            "output": "ok\n",
+        }):
+            result = snapshot.capture(object(), selected)
+
+        self.assertTrue(result["completed"])
+        self.assertEqual([item["name"] for item in result["commands"]], ["one"])
+
+    def test_default_capture_excludes_vendor_diagnostic_reads(self):
+        all_names = {name for name, _command in snapshot.COMMANDS}
+        default_names = {name for name, _command in snapshot.DEFAULT_COMMANDS}
+
+        self.assertTrue(snapshot.TARGET_ONLY_NAMES <= all_names)
+        self.assertFalse(snapshot.TARGET_ONLY_NAMES & default_names)
+        self.assertIn("proc_udm_input", all_names)
+        self.assertNotIn("proc_udm_input", default_names)
 
     def test_command_failure_is_preserved(self):
         with mock.patch.object(snapshot.common, "command", side_effect=TimeoutError("late")):

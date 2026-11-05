@@ -14,6 +14,8 @@ This repository contains two separate ZV-E10 access routes. Preserve that bounda
 - `linux/host/`: host-side service transport, backup, verification, and terminal tools.
 - `linux/host/zve10_runtime_snapshot.py`: fixed read-only capture of volatile physical-camera state for emulator comparison.
 - `linux/host/zve10_hardware_snapshot.py`: fixed read-only capture of deeper procfs/sysfs hardware topology.
+  Its broad default excludes vendor diagnostic procfs reads; select those
+  individually with repeatable `--only` arguments.
 - `linux/scripts/`: reusable setup and privilege-aware launchers.
 - `linux/helpers/bootrom-reader/`: temporary camera-side read-only helper.
 - `fastboot/stage1/` and `fastboot/stage2/`: paired bare-metal payload sources.
@@ -38,6 +40,7 @@ sh -n scripts/*.sh
 # Hardware-only, output stays private:
 ./scripts/run_runtime_snapshot.sh
 ./scripts/run_hardware_snapshot.sh
+./scripts/run_hardware_snapshot.sh --only proc_udm_input
 
 cd ../fastboot
 make test PYTHON=python3

@@ -48,6 +48,8 @@ docs/                     操作说明
 ./scripts/run_file_backup.sh --phase critical
 ./scripts/run_runtime_snapshot.sh
 ./scripts/run_hardware_snapshot.sh
+# 单独采集厂商诊断接口，而不是把它加入完整采集：
+./scripts/run_hardware_snapshot.sh --only proc_udm_input
 
 .venv/bin/python host/zve10_verify.py manifest \
   --manifest backups/zve10-raw-emmc-*/manifest.json
@@ -65,6 +67,9 @@ docs/                     操作说明
 ```sh
 ./scripts/run_terminal.sh --owner-authorized-write
 ```
+
+硬件快照默认运行 111 个有界的 procfs/sysfs 采集。另有 34 个厂商诊断文件可通过可重复的
+`--only` 参数单独采集。它们不在默认采集中，因为相机固件忙碌时，单个厂商 procfs 读取可能阻塞。
 
 ## 原始备份产物
 

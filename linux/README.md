@@ -50,6 +50,8 @@ Requires Python 3.10+, `libusb`, the camera in USB mass-storage mode, and about
 ./scripts/run_file_backup.sh --phase critical
 ./scripts/run_runtime_snapshot.sh
 ./scripts/run_hardware_snapshot.sh
+# Isolate a vendor diagnostic surface instead of adding it to the broad pass:
+./scripts/run_hardware_snapshot.sh --only proc_udm_input
 
 .venv/bin/python host/zve10_verify.py manifest \
   --manifest backups/zve10-raw-emmc-*/manifest.json
@@ -67,6 +69,11 @@ Full shell:
 ```sh
 ./scripts/run_terminal.sh --owner-authorized-write
 ```
+
+The hardware snapshot runs 111 bounded procfs/sysfs captures by default. A
+further 34 vendor diagnostic files are available through repeatable `--only`
+arguments. They are deliberately excluded from the default pass because an
+individual vendor procfs read can block while camera firmware is busy.
 
 ## Raw backup output
 
