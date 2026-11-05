@@ -126,6 +126,7 @@ disk and hashed again before being renamed into place.
 - [Verification](docs/verification.md)
 - [BootROM dump](docs/bootrom-dump.md)
 - [Linux hardware validation record](docs/hardware-validation.md)
+- [Cross-camera research](docs/cross-camera-research.md)
 - [Fastboot / eMMC](../fastboot/README.md)
 
 Not affiliated with or endorsed by Sony.

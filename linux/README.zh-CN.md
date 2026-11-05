@@ -116,6 +116,7 @@ backups/zve10-raw-emmc-<时间戳>/
 - [校验](docs/verification.zh-CN.md)
 - [BootROM dump](docs/bootrom-dump.zh-CN.md)
 - [Linux 实机验证记录](docs/hardware-validation.zh-CN.md)
+- [跨机型研究](docs/cross-camera-research.zh-CN.md)
 - [Fastboot / eMMC](../fastboot/README.zh-CN.md)
 
 与 Sony 无关，也未获 Sony 认可。

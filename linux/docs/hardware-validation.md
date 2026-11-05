@@ -1,5 +1,7 @@
 # Linux host validation: firmware 30110_05
 
+[简体中文](hardware-validation.zh-CN.md)
+
 This record summarizes a read-only Linux-host session on an owned Sony ZV-E10 running `30110_05.2025031501`. Raw evidence and camera data remain outside the repository.
 
 ## Connection and boundary

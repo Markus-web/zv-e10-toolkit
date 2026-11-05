@@ -1,5 +1,7 @@
 # Cross-camera research applied to the ZV-E10
 
+[简体中文](cross-camera-research.zh-CN.md)
+
 Sony camera research is useful when it is treated as a source of hypotheses and
 formats, not as a source of addresses. This comparison used
 [`RafalB82/sony-a6000-re`](https://github.com/RafalB82/sony-a6000-re) at
