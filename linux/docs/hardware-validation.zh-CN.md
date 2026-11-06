@@ -40,8 +40,9 @@
 | USB 调度 | USB 工作线程使用 `usb_event_read`、poll、OSAL 与 futex 等待路径 |
 | 启动状态 | UPM 报告 `NORM`；快照期间为 optimize/normal 状态，且无 swap 文件 |
 | eMMC 健康 | Alfred 报告正常的预寿命终止与寿命值，且无读写重试计数 |
+| 隐藏调整审计 | 录像限制已为 `13h 01m`，PAL/NTSC 选择器和 USB app-installer 标志已启用；旧版 4K 限制属性不存在；已启用 18/35 种语言；未写入设置 |
 | 临时助手 | 从 `/tmp_network` 执行，完成后删除 |
-| Linux 离线测试 | 20 项通过 |
+| Linux 离线测试 | 25 项通过 |
 | Fastboot 离线测试 | 18 项通过；ABI 与正式配对检查通过 |
 
 BootROM 助手首次选择了此固件不存在的 tmpfs 路径，并在未改变相机的情况下停止。维护后的启动器只从明确白名单（`/tmp_bt`、`/tmp_network`、`/tmp_ipsec`）选择，并拒绝其他位置。

@@ -46,6 +46,7 @@ sh -n scripts/*.sh
 ./scripts/run_hardware_snapshot.sh
 ./scripts/run_hardware_snapshot.sh --only proc_udm_input
 ./scripts/inspect_backup.sh /private/path/Backup.bin
+./scripts/inspect_backup.sh --tweaks /private/path/Backup.bin
 ./scripts/probe_usb_streaming.sh --duration 10
 
 cd ../fastboot

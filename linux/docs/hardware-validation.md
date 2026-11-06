@@ -40,8 +40,9 @@ This record summarizes a read-only Linux-host session on an owned Sony ZV-E10 ru
 | USB scheduling | USB workers used `usb_event_read`, poll, OSAL, and futex wait paths |
 | Boot state | UPM reported `NORM`; snapshot boot was in optimize/normal state with no swap file |
 | eMMC health | Alfred reported normal pre-EOL/lifetime values and no read/write retry counts |
+| Hidden-tweak audit | Recording limit already `13h 01m`, PAL/NTSC selector and USB app-installer flags enabled; legacy 4K-limit property absent; 18/35 languages active; no setting written |
 | Temporary helper | Executed from `/tmp_network`, removed after use |
-| Offline Linux tests | 20 passed |
+| Offline Linux tests | 25 passed |
 | Fastboot offline tests | 18 passed; ABI and release-pair checks passed |
 
 The BootROM helper first tried a tmpfs path absent on this firmware and stopped without changing the camera. The maintained launcher now selects from an explicit tmpfs allow-list (`/tmp_bt`, `/tmp_network`, `/tmp_ipsec`) and rejects other locations.

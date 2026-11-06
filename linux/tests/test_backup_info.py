@@ -32,6 +32,37 @@ class BackupInfoTests(unittest.TestCase):
         for forbidden in ("region", "serial", "model", "property_values", "id1"):
             self.assertNotIn(forbidden, result)
 
+    def test_tweak_summary_omits_ids_region_and_raw_values(self):
+        values = {
+            "recLimit": bytes((13, 1, 0)),
+            "recLimit4k": bytes((0xff, 0x7f)),
+            "language": bytes((1,)) * 35,
+            "palNtscSelector": b"\x01",
+            "usbAppInstaller": b"\x00",
+        }
+        backup = mock.Mock()
+        backup.readProp.side_effect = values.__getitem__
+        backup.getRegion.return_value = "MODEL_CE"
+        backup.getDefaultLanguages.side_effect = (
+            lambda region: backup_info.BackupInterface.getDefaultLanguages(None, region)
+        )
+
+        result = backup_info.summarize_tweaks(backup)
+
+        self.assertEqual(
+            [item["name"] for item in result],
+            [
+                "recording_limit", "recording_limit_4k", "languages",
+                "pal_ntsc_selector", "usb_app_installer",
+            ],
+        )
+        self.assertTrue(result[0]["enabled"])
+        self.assertEqual(result[0]["status"], "13h 01m 00s")
+        self.assertFalse(result[-1]["enabled"])
+        rendered = repr(result).lower()
+        for forbidden in ("region", "serial", "property", "0x003c", "raw"):
+            self.assertNotIn(forbidden, rendered)
+
 
 if __name__ == "__main__":
     unittest.main()

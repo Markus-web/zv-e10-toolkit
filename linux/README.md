@@ -55,6 +55,7 @@ Requires Python 3.10+, `libusb`, the camera in USB mass-storage mode, and about
 # Isolate a vendor diagnostic surface instead of adding it to the broad pass:
 ./scripts/run_hardware_snapshot.sh --only proc_udm_input
 ./scripts/inspect_backup.sh /private/path/Backup.bin
+./scripts/inspect_backup.sh --tweaks /private/path/Backup.bin
 ./scripts/probe_usb_streaming.sh --duration 10
 
 .venv/bin/python host/zve10_verify.py manifest \
