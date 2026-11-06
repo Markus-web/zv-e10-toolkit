@@ -29,6 +29,7 @@ docs/                     Operation guides
 | `host/zve10_get_file.py` | Read one explicit file through FileControl READ | None |
 | `host/zve10_verify.py` | Verify manifests, `SHA256SUMS`, and partition slices offline | None |
 | `host/zve10_backup_info.py` | Inspect private `Backup.bin` structure without identifiers or property values | None |
+| `host/zve10_usb_stream_probe.py` | Validate official UVC video and USB Audio without printing the camera serial or saving media | None |
 | `host/zve10_terminal_server.py` + client | Service shell; read-only allow-list by default | None by default; write mode optional |
 | `host/zve10_read_file_jiritsu.py` | Optional Jiritsu `GET_FILE` reader | None |
 | `host/zve10_bootrom_dump.py` | Two-pass BootROM read through `/dev/mem` | Temporary helper in `/tmp_bt` tmpfs |
@@ -54,6 +55,7 @@ Requires Python 3.10+, `libusb`, the camera in USB mass-storage mode, and about
 # Isolate a vendor diagnostic surface instead of adding it to the broad pass:
 ./scripts/run_hardware_snapshot.sh --only proc_udm_input
 ./scripts/inspect_backup.sh /private/path/Backup.bin
+./scripts/probe_usb_streaming.sh --duration 10
 
 .venv/bin/python host/zve10_verify.py manifest \
   --manifest backups/zve10-raw-emmc-*/manifest.json
@@ -127,6 +129,7 @@ disk and hashed again before being renamed into place.
 - [BootROM dump](docs/bootrom-dump.md)
 - [Linux hardware validation record](docs/hardware-validation.md)
 - [Cross-camera research](docs/cross-camera-research.md)
+- [USB Streaming](docs/usb-streaming.md)
 - [Fastboot / eMMC](../fastboot/README.md)
 
 Not affiliated with or endorsed by Sony.

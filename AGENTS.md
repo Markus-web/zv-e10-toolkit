@@ -18,6 +18,8 @@ This repository contains two separate ZV-E10 access routes. Preserve that bounda
   individually with repeatable `--only` arguments.
 - `linux/host/zve10_backup_info.py`: offline metadata-only `Backup.bin`
   inspection; never add identifiers or property values to its default output.
+- `linux/host/zve10_usb_stream_probe.py`: serial-safe validation of Sony's
+  official UVC and USB Audio streaming mode; it saves no media.
 - `linux/scripts/`: reusable setup and privilege-aware launchers.
 - `linux/helpers/bootrom-reader/`: temporary camera-side read-only helper.
 - `fastboot/stage1/` and `fastboot/stage2/`: paired bare-metal payload sources.
@@ -44,6 +46,7 @@ sh -n scripts/*.sh
 ./scripts/run_hardware_snapshot.sh
 ./scripts/run_hardware_snapshot.sh --only proc_udm_input
 ./scripts/inspect_backup.sh /private/path/Backup.bin
+./scripts/probe_usb_streaming.sh --duration 10
 
 cd ../fastboot
 make test PYTHON=python3
