@@ -82,6 +82,15 @@ individual vendor procfs read can block while camera firmware is busy.
 Cross-model methods and their ZV-E10 validation status are recorded in
 [`docs/cross-camera-research.md`](docs/cross-camera-research.md).
 
+## Backup properties and project extensions
+
+The existing persistent terminal server also accepts structured `backup-read` and
+owner-authorized `backup-write` actions through the same client/connection. These
+are settings properties, not disk images. See [Backup property operations and
+extension API](docs/backup-properties.md) for original-value guards, private
+snapshots, persistence/readback, and the optional project action hook. The new
+integration has offline tests only; no new camera test was performed.
+
 ## Raw backup output
 
 ```
@@ -100,8 +109,8 @@ disk and hashed again before being renamed into place.
 
 - The Python tools here do not write back images or restore partitions; `../fastboot/`
   does have a verified partition-level restore (see its README).
-- File inventory uses `busybox find` when available and falls back to recursive
-  shell builtins on firmware builds that omit the BusyBox `find` applet.
+- File inventory uses bounded, one-directory-at-a-time shell builtins because
+  the validated firmware omits the BusyBox `find` and `stat` applets.
 - Raw images are what the Linux driver exposes, not a physical chip dump; no
   RPMB, OTP/eFuse, or hidden areas.
 - Not an atomic snapshot: read-write partitions can change between the two
