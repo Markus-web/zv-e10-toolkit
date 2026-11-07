@@ -22,7 +22,8 @@ Pico 串口注入 `stage1` → stage1 建立 USB 通信 → 电脑端 `host/` �
 
 ## 先准备什么
 
-- RP2040 Pico、24pin USB-C 转接板、复位电阻与 CC 下拉，按 [硬件说明](docs/hardware.zh-CN.md)接线；相机装好电池。
+- RP2040 Pico、24pin USB-C 转接板、复位电阻与共用 CC 下拉；按
+  [物料清单、硬件接线和装配验收](docs/hardware.zh-CN.md)操作；相机装好电池。
 - 按 [Pico 准备说明](pico/README.zh-CN.md)编译并安装发送固件。
 - Python 3.10+、libusb、Android platform-tools 中的 `fastboot`。本路线不需要 Sony-PMCA-RE。
 

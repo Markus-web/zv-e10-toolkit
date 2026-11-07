@@ -22,7 +22,9 @@ Pico serial injection → stage1 establishes USB → computer-side `host/` loads
 
 ## Prerequisites
 
-- RP2040 Pico, a 24-pin USB-C breakout, reset resistor and CC pull-downs: follow [wiring](docs/hardware.md), with a battery installed.
+- RP2040 Pico, a 24-pin USB-C breakout, reset resistor and shared CC pull-down:
+  follow the [bill of materials, wiring, and assembly acceptance](docs/hardware.md),
+  with a battery installed.
 - Build and install the sender firmware using the [Pico setup guide](pico/README.md).
 - Python 3.10+, libusb and `fastboot` from Android platform-tools. Sony-PMCA-RE is not required.
 

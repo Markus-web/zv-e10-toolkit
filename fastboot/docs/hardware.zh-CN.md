@@ -2,6 +2,31 @@
 
 # 硬件与接线
 
+## 物料清单
+
+已验证的方案使用下列部件。制造商料号比经销商库存号更重要。
+
+| 数量 | 用途 | 选定部件 |
+|---:|---|---|
+| 1 | RP2040 发送器 | Raspberry Pi Pico H `SC0917`（已焊排针） |
+| 1 | 相机插头转接板 | Saiko `BRK-USB-CPV3.0`，全引脚 USB-C 公头转接板 |
+| 1 | 必需的复位保护 | Yageo `CFR-25JB-52-470R`，470Ω，1/4 W |
+| 1 | 可选的串口保护 | 同款 470Ω 电阻；见下方接线图 |
+| 1 | CC 共用下拉 | Yageo `CFR-25JB-52-5K1`，5.1kΩ，1/4 W |
+| 1 | Pico 编程线 | USB-A 转 Micro-B **数据**线 |
+| 按需 | 连接材料 | 短的 22-28 AWG 绝缘线和热缩管 |
+
+DigiKey Finland 当前产品页：[Pico H](https://www.digikey.fi/en/products/detail/raspberry-pi/SC0917/16608257)、
+[Saiko 转接板](https://www.digikey.fi/en/products/detail/saiko-systems-ltd/BRK-USB-CPV3-0/15283090)、
+[470Ω 电阻](https://www.digikey.fi/en/products/detail/yageo/CFR-25JB-52-470R/2211)、
+[5.1kΩ 电阻](https://www.digikey.fi/en/products/detail/yageo/CFR-25JB-52-5K1/2236)和
+[短 Micro-B 数据线](https://www.digikey.fi/en/products/detail/cvilux-usa/DH-20M50057/13177527)。
+电阻可多买几个备用。第二块转接板可防止手工装配时损坏后需要重新下单，但电路只需要一块。
+
+细尖直头 ESD 安全镊子便于固定导线和电阻引脚。低成本选择为
+[Seeed/Vetus 12 型镊子 `404070001`](https://www.digikey.fi/en/products/detail/seeed-technology-co-ltd/404070001/5488233)。
+镊子不能替代细头烙铁、助焊剂、绝缘、应力消除和导通测试。
+
 ## 接线图
 
 ```
@@ -27,7 +52,21 @@ USB-C 公头（24pin 小板，A/B 两面都引出）
 - GP28 和 GP27 不能互换；
 - GP29（MULTI_RX）当前不接；
 - 470Ω：GP27 → D+ 必需；GP28 → D− 可选；
+- 先把 CC1 和 CC2 并接，再从这个共用节点通过**一个** 5.1kΩ 电阻接地。不要把接线图理解为每个 CC 引脚各用一个电阻；
 - VBUS、GND 各接一根即可，相机内部已经并联。
+
+## 装配验收
+
+Saiko 板只是裸转接板，不是成品恢复线。如果交给电子维修店或创客装配，
+请提供本页并要求：
+
+1. 使用短绝缘线，所有焊点绝缘，并加机械应力消除，避免裸板撬动相机插座；
+2. 放大检查所有焊点；
+3. 按接线图逐点测量导通，包括共用 CC 节点以及分开的 GP27/GP28 路径；
+4. 连接相机前，检查 VBUS、GND、D+、D−、CC 及相邻焊盘之间没有短路；
+5. Pico 3.3 V 不得连接到相机信号脚，也不得用只有 4 或 6 引脚的简化 USB-C 转接板替代。
+
+不要用相机测试未完成的接线。应先完成并记录无源导通检查。
 
 ## 电池与复位
 
