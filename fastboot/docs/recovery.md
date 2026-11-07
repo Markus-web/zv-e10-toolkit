@@ -22,9 +22,9 @@ other models or firmware without verifying offsets and capacities.
 
 ```sh
 BACKUP=/path/to/backup
-.venv/bin/python tools/zve10_verify.py manifest --manifest "$BACKUP/manifest.json"
-.venv/bin/python tools/zve10_verify.py sums --sums "$BACKUP/SHA256SUMS"
-.venv/bin/python tools/zve10_verify.py slices \
+.venv/bin/python host/zve10_verify.py manifest --manifest "$BACKUP/manifest.json"
+.venv/bin/python host/zve10_verify.py sums --sums "$BACKUP/SHA256SUMS"
+.venv/bin/python host/zve10_verify.py slices \
   --read1 "$BACKUP/nflasha.read1.bin" --read2 "$BACKUP/nflasha.read2.bin" \
   --layout examples/partitions.sample.tsv --json "$BACKUP/offline-verification.json"
 ```
@@ -33,6 +33,12 @@ The first two checks should pass. The slice report records differences between
 reads; decide which content is appropriate before restoring a changing writable
 partition. Recovery defaults to read1 and checks its slice hashes. The manifest
 and partition report serve different purposes and are not interchangeable.
+Two complete user-area reads may differ because mounted writable partitions such
+as `/setting` change during normal operation or service authentication. This does
+not establish that an unrelated recovery partition is bad or good. Require the
+target partition's two slice hashes to match, or document why a specific read is
+authoritative, before preparing a restore. Never substitute whole-image equality
+for target-partition verification.
 
 ## Prepare offline first
 
@@ -58,8 +64,8 @@ Wire the hardware and inject stage1, then run:
 ```
 
 The script loads writable stage2, flashes the named partitions as sparse images,
-and verifies readback. Check the results before rebooting. An approximately
-Long sessions have been validated past the four-minute reset point; larger
+and verifies readback. Check the results before rebooting. Long sessions have
+been validated past the four-minute reset point; larger
 restores can run in one session. See the
 [long-session workflow](long-session.md). The tool writes only explicitly named
 user partitions and does not automatically reboot.

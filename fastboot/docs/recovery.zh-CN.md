@@ -20,9 +20,9 @@
 
 ```sh
 BACKUP=/path/to/backup
-.venv/bin/python tools/zve10_verify.py manifest --manifest "$BACKUP/manifest.json"
-.venv/bin/python tools/zve10_verify.py sums --sums "$BACKUP/SHA256SUMS"
-.venv/bin/python tools/zve10_verify.py slices \
+.venv/bin/python host/zve10_verify.py manifest --manifest "$BACKUP/manifest.json"
+.venv/bin/python host/zve10_verify.py sums --sums "$BACKUP/SHA256SUMS"
+.venv/bin/python host/zve10_verify.py slices \
   --read1 "$BACKUP/nflasha.read1.bin" --read2 "$BACKUP/nflasha.read2.bin" \
   --layout examples/partitions.sample.tsv --json "$BACKUP/offline-verification.json"
 ```
@@ -30,6 +30,9 @@ BACKUP=/path/to/backup
 前两项校验应通过。分区切片报告会记录两遍数据的差异；对于有差异的可写分区，
 应先判断哪一份内容适合恢复。恢复工具默认使用 `read1`，并校验对应的切片哈希。
 `manifest.json` 与分区清单用途不同，不能相互替代。
+即使两遍用户区镜像都完整，正常运行或服务认证也可能使 `/setting` 等已挂载可写分区发生变化。
+这不能证明其他恢复目标分区有效或无效。准备恢复前，必须确认目标分区的两遍切片哈希一致；
+若必须选用其中一遍，则须记录其权威依据。不得用整镜像是否一致代替目标分区校验。
 
 ## 先做离线准备
 
