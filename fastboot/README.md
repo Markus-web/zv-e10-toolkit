@@ -78,6 +78,12 @@ The countdown begins only after the Pico identity and safe idle state pass.
 Treat `NOW: stage1 injection` as the action boundary. The camera must be on the
 Pico breakout at that point, not on its normal computer cable.
 
+The published `prebuilt/stage1.bin` still uses the validated 30-second handoff.
+A locally rebuilt source candidate instead holds the camera LED solid for the
+entire handoff: while it is solid, disconnect the breakout and insert the
+normal computer USB-C cable. It turns off only after VBUS goes low then high.
+Keep that candidate local until real-camera and paired-ABI validation pass.
+
 See [exploration](docs/exploration.md) for memory access.
 `host/backup_compare.py` compares reads with your backup's
 partition verification report.

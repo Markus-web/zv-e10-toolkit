@@ -31,25 +31,24 @@
  * With the bridge still attached, the injector keeps toggling D- while the
  * USB PHY is live, and the host connection cannot happen anyway. VBUS goes
  * low when the bridge is unplugged and high again when the PC is plugged in
- * (OTG_USB_ID_EXT bit 0). If that register does not behave, the loop simply
- * times out after 30 s and the payload carries on -- the heartbeat pulses
- * tell the operator it is still waiting rather than stuck.
+ * (OTG_USB_ID_EXT bit 0). Keep the front LED solid throughout this handoff:
+ * solid means "insert the normal USB-C cable now". Do not time out and start
+ * DWC3 without an observed low-to-high edge; that would make the indicator
+ * lie and could bring up the USB controller while the bridge is still wired.
  */
 static void wait_for_handoff(void)
 {
     int seen_low = 0;
-    int i;
 
-    for (i = 0; i < 300; i++) {          /* 300 x 100 ms = 30 s ceiling */
+    led_on();
+    for (;;) {
         int vbus = usb_phy_vbus();
 
         if (!vbus)
             seen_low = 1;
-        if (seen_low && vbus)
+        if (seen_low && vbus) {
+            led_off();
             return;
-
-        if ((i % 20) == 19) {
-            led_heartbeat();
         }
         mdelay(100);
     }

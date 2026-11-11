@@ -27,7 +27,11 @@ lets the payload console transmit (which needs a level shifter).
 
 #define LINK_BAUD 48000u
 
+#ifndef RESET_PULSE_US
 #define RESET_PULSE_US 10u
+#endif
+static_assert(RESET_PULSE_US >= 10u && RESET_PULSE_US <= 100000u,
+              "RESET_PULSE_US must stay between 10 us and 100 ms");
 #define STARVE_MS      1200u
 
 #ifndef UART_TX
@@ -100,11 +104,15 @@ static void send_text(uint8_t type, const char *s) {
   send_pkt(type, s, (uint16_t)strlen(s));
 }
 
-static void pulse_reset(void) {
+static void pulse_reset(uint32_t pulse_us, uint8_t observation[4]) {
+  observation[0] = gpio_get(MULTI_RST);
   sio_hw->gpio_clr    = 1u << MULTI_RST;
   sio_hw->gpio_oe_set = 1u << MULTI_RST;
-  busy_wait_us_32(RESET_PULSE_US);
+  observation[1] = gpio_get(MULTI_RST);
+  busy_wait_us_32(pulse_us);
   sio_hw->gpio_oe_clr = 1u << MULTI_RST;
+  observation[2] = gpio_get(MULTI_RST);
+  observation[3] = (uint8_t)gpio_get_function(MULTI_RST);
 }
 
 static void carrier_start(void) {
@@ -228,10 +236,18 @@ static void handle_pkt(uint8_t type, uint8_t *d, uint16_t len) {
 
   case CMD_RESET:
     // v15: GP27 -> 470R -> camera D+ (A6), active-low reset pulse.
-    if (len) { send_text(EVT_ERR, "reset takes no body"); break; }
+    if (len != 0 && len != 4) { send_text(EVT_ERR, "reset takes u32 us"); break; }
     if (blob_pending) { send_text(EVT_ERR, "blob pending"); break; }
-    pulse_reset();
-    send_pkt(EVT_ACK, NULL, 0);
+    {
+      uint32_t pulse_us = len ? le32(d) : RESET_PULSE_US;
+      if (pulse_us < 10u || pulse_us > 100000u) {
+        send_text(EVT_ERR, "reset range 10..100000 us");
+        break;
+      }
+      uint8_t observation[4];
+      pulse_reset(pulse_us, observation);
+      send_pkt(EVT_ACK, observation, sizeof(observation));
+    }
     break;
 
   case CMD_CARRIER:

@@ -1,9 +1,7 @@
 """Inspect v15 sender firmware and idle pin status without sending camera records."""
 import argparse
 import json
-from pico_link import Link
-
-VERSION = b'zve10_uart_od 15'
+from pico_link import Link, SENDER_VERSION, safe_idle
 
 
 def main():
@@ -13,12 +11,10 @@ def main():
     link = Link(args.port)
     try:
         version = link.exchange(1)
-        if version != VERSION:
+        if version != SENDER_VERSION:
             raise ValueError('Expected zve10_uart_od 15, received ' + repr(version))
         status = link.status()
-        if (status['mode'] != 0 or status['gpio_function'] != 5 or
-                status['pull_up'] or status['pull_down'] or
-                status['push_pull_build'] or status['blob_pending']):
+        if not safe_idle(status):
             raise ValueError('Sender is not idle with open-drain configuration')
         print(json.dumps({'firmware': version.decode(), 'status': status}, indent=2))
     finally:

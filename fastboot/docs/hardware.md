@@ -71,6 +71,14 @@ Do not mix sides. The fallback replaces the complete A6/A7 pair with B6/B7:
 GP27 goes through 470Ω to B6 D+, and GP28 goes directly to B7 D−. It does not
 connect both pairs or combine A6 with B7.
 
+### Optional passive Pico 2 monitor
+
+The second Pico is not part of the injection circuit. For diagnostics only,
+connect its physical pin 34 (`GP28`) to one camera-side signal under test and
+physical pin 38 (`GND`) to common ground. Leave its physical pin 40 (`VBUS`),
+physical pin 32 (`GP27`) and every other pin disconnected. Monitor A6 or A7,
+never both at once. The first Pico remains the only VBUS source and sender.
+
 ## Notes
 
 - The camera side is a USB-C receptacle; a male 24-pin breakout is required
@@ -145,6 +153,36 @@ natural screen sequence and changing breadboard contacts. This is an incomplete
 adapter bring-up, not new fastboot hardware validation. No eMMC, SD or OTP write
 was attempted. Runtime logs and device identifiers remain private and ignored.
 
+### Two-Pico passive diagnosis, 2026-11-12
+
+An RP2350 Pico 2 running the same v15 firmware was used only as a passive GP28
+input with no pulls. The reusable `pico/monitor_line.py` tool summarized edges
+while the RP2040 sender operated. Both boards repeatedly passed firmware
+identity and safe-idle checks.
+
+- One A6 observation saw 1,457 ordinary USB transitions in 729 capture windows,
+  proving that the passive monitor and camera-side A6 node could be observed.
+- Later, after breadboard rewiring, a bounded 10 ms GP27 reset produced no A6
+  transition. Sender pad readback was low before, during and after the pulse,
+  with GPIO function 5 (SIO), while the monitor had previously read A6 high.
+- During a 12-second published-stage1 injection, A7 stayed low and the passive
+  monitor saw zero transitions in 1,213 windows. The camera did not flash its
+  LED and no fastboot device appeared.
+- A6 and the reported GP27 node each measured 2.20 V with a multimeter, but that
+  time-averaged reading does not prove a continuous point-to-point path.
+
+These observations conflict across changing breadboard states. They identify
+the GP27 -> 470 ohm -> A6 assembly as unresolved; they do **not** establish a
+camera, BootROM or payload defect. Before another injection, power off and
+record all four continuity segments: GP27 to resistor input (about 0 ohm),
+across the resistor (about 470 ohm), resistor output to A6 (about 0 ohm), and
+GP27 to A6 end-to-end (about 470 ohm). Then require the passive monitor to see
+the bounded 10 ms A6 pulse. No camera storage write was attempted.
+
+When two Picos are connected, use stable `/dev/serial/by-id/` paths. Before a
+UF2 deployment, unplug the other board and verify the target USB ID and volume
+label as documented in [Pico sender setup](../pico/README.md).
+
 ## Switching the cable to the PC
 
 - The payload detects VBUS low → high. After the long flash, unplug the 24-pin
@@ -154,8 +192,13 @@ was attempted. Runtime logs and device identifiers remain private and ignored.
 
 ## LED
 
-- One long flash (0.4 s): payload is alive.
-- Short pulse count: USB clock/PHY → DWC3 → EP0 configuration → waiting for host.
+- Published prebuilt: one long flash (0.4 s) means the payload is alive; its
+  validated handoff window remains 30 seconds.
+- Locally rebuilt source candidate: after the initial alive and USB PHY
+  patterns, solid means **disconnect the breakout and insert the normal USB-C
+  cable now**. It stays solid until VBUS has gone low then high. If it never
+  turns off, the handoff was not detected and DWC3 initialization does not run.
+- After a successful handoff, short pulse count reports DWC3 and EP0 setup.
 - One short pulse every 2 s afterwards: waiting for host enumeration.
 - Stopping after the Nth short pulse: the corresponding step did not return.
 

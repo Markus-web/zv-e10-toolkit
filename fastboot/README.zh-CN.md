@@ -72,6 +72,11 @@ fastboot fetch nflasha10 backup.bin
 倒计时只会在 Pico 身份与安全空闲状态检查通过后开始。以
 `NOW: stage1 injection` 为操作边界；此时相机必须接 Pico 转接板，不能接普通电脑线。
 
+已发布的 `prebuilt/stage1.bin` 仍使用经验证的 30 秒换线窗口。
+本地重建的源码候选版则在整个换线阶段保持相机 LED 常亮：
+LED 常亮时，拔下转接板并插入普通电脑 USB-C 线。检测到 VBUS
+先低后高才熄灭。完成相机实测和配对 ABI 验证前，该候选镜像仅保留在本地。
+
 内存访问命令见[内存与分区读取说明](docs/exploration.zh-CN.md)。
 `host/backup_compare.py` 可将读取结果与自己的备份分区清单比较。
 

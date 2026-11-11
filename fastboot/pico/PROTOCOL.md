@@ -125,3 +125,33 @@ SET_UNLOCK(0x8CB102DC)
 - 注入阶段只写 SRAM；加载可写 stage2 并执行 flash 后会修改 eMMC。
 - 更大载荷由本仓库的 stage2 USB 加载流程承接。
 - 不是运行时漏洞；需要专用接线与上电时序。
+
+## 10. 主机到 Pico 的诊断命令
+
+这一层不是相机 BootROM 协议。主机以 `type:u8 + length:u16le + body`
+向 Pico 发命令；Pico 以相同头部返回 `ACK 0x81` 或 `ERR 0x82`。
+
+### `CMD_RESET 0x02`
+
+- 空 body：使用正常的 10 us GP27 低脉冲；
+- 4 字节 body：`pulse_us:u32le`，只允许 10..100000 us；
+- 新固件回复 4 字节：`before`、`during`、`after`、`gpio_function`；
+- 旧 v15 固件回复空 body，主机工具仍兼容。
+
+注入命令始终发空 body，不改变已验证的 10 us 默认值。
+`reset_only.py --pulse-us` 才使用有界的诊断脉宽。
+
+### `CAPTURE 0x0A`
+
+只允许在无待发 blob 时使用。Pico 在 20 ms 内被动观测 GP28，
+最多返回 64 个边沿：
+
+```text
+count:u16le
+repeat count times:
+    delta_us:u32le
+    level:u8
+```
+
+`monitor_line.py` 要求 Pico 处于 SIO 输入、无上下拉、无待发 blob 的安全空闲状态。
+工具只汇总跹变数和间隔，不保存原始波形。

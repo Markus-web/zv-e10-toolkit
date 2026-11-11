@@ -1,6 +1,26 @@
 """Framed serial transport for the v15 Pico sender."""
 import struct
 
+SENDER_VERSION = b'zve10_uart_od 15'
+STATUS_FIELDS = ('mode', 'gpio_function', 'level', 'pull_up', 'pull_down',
+                 'push_pull_build', 'blob_pending')
+RESET_FIELDS = ('before', 'during', 'after', 'gpio_function')
+
+
+def safe_idle(status):
+    return (status['mode'] == 0 and status['gpio_function'] == 5 and
+            not status['pull_up'] and not status['pull_down'] and
+            not status['push_pull_build'] and not status['blob_pending'])
+
+
+def decode_reset_observation(reply):
+    """Decode the optional v15 reset-pad reply; old firmware returned empty."""
+    if not reply:
+        return None
+    if len(reply) != len(RESET_FIELDS):
+        raise ValueError('Malformed reset observation')
+    return dict(zip(RESET_FIELDS, reply))
+
 class Link:
     def __init__(self, port):
         import serial
@@ -31,4 +51,4 @@ class Link:
         data = self.exchange(9)
         if len(data) != 7:
             raise ValueError('Bad status length')
-        return dict(zip(('mode', 'gpio_function', 'level', 'pull_up', 'pull_down', 'push_pull_build', 'blob_pending'), data))
+        return dict(zip(STATUS_FIELDS, data))

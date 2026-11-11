@@ -14,10 +14,10 @@ import time
 import zlib
 from pathlib import Path
 
-from pico_link import Link
+from pico_link import (Link, SENDER_VERSION, decode_reset_observation,
+                       safe_idle)
 from operator_timing import countdown
 
-VERSION = b'zve10_uart_od 15'
 V = 0x8CB102DC
 LOAD = 0xFE020000
 ENTRY = 0xFE020001
@@ -45,16 +45,10 @@ def make_records(payload):
     return out
 
 
-def idle(status):
-    return (status['mode'] == 0 and status['gpio_function'] == 5 and
-            not status['pull_up'] and not status['pull_down'] and
-            not status['push_pull_build'] and not status['blob_pending'])
-
-
 def run(port, payload, payload_name='', duration=90, record_gap=0.0144, group_gap=0.05,
         reset_delay=0.1, reset=True, max_groups=0, countdown_seconds=0):
     records = make_records(payload)
-    result = {'port': port, 'firmware': VERSION.decode(),
+    result = {'port': port, 'firmware': SENDER_VERSION.decode(),
               'payload_file': payload_name,
               'payload_size': len(payload),
               'payload_sha256': hashlib.sha256(payload).hexdigest(),
@@ -69,16 +63,19 @@ def run(port, payload, payload_name='', duration=90, record_gap=0.0144, group_ga
     link = None
     try:
         link = Link(port)
-        if link.exchange(1) != VERSION:
+        if link.exchange(1) != SENDER_VERSION:
             raise RuntimeError('Unexpected firmware (need zve10_uart_od 15)')
         result['before'] = link.status()
-        if not idle(result['before']):
+        if not safe_idle(result['before']):
             raise RuntimeError('Pico must be idle input without pulls')
 
         countdown(countdown_seconds, 'NOW: stage1 injection')
         link.exchange(3, b'\x01')
         if reset:
-            link.exchange(2)          # GP27 reset pulse
+            observation = decode_reset_observation(link.exchange(2))
+            if observation:
+                result['reset_observation'] = observation
+                print('reset pad:', observation, flush=True)
             time.sleep(reset_delay)
         print(f'{"RESET + " if reset else ""}group: '
               f'{len(payload)} B, {len(records)} records, '
@@ -100,7 +97,7 @@ def run(port, payload, payload_name='', duration=90, record_gap=0.0144, group_ga
 
         link.exchange(3, b'\x00')
         result['after'] = link.status()
-        if not idle(result['after']):
+        if not safe_idle(result['after']):
             raise RuntimeError('Pico did not return to idle input')
         result['passed'] = True
     finally:
