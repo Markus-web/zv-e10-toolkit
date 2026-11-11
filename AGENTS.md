@@ -24,6 +24,8 @@ This repository contains two separate ZV-E10 access routes. Preserve that bounda
 - `linux/helpers/bootrom-reader/`: temporary camera-side read-only helper.
 - `fastboot/stage1/` and `fastboot/stage2/`: paired bare-metal payload sources.
 - `fastboot/host/` and `fastboot/pico/`: computer-side bootstrap and injection tools.
+- `fastboot/pico/operator_timing.py`: shared flushed countdown used by physical-camera commands.
+- `fastboot/pico/tests/`: offline tests for operator-visible Pico command timing.
 - `fastboot/prebuilt/`: hardware-validated paired payloads; never update hashes to hide an ABI change.
 - Each route's `docs/`: safety boundaries, operation steps, and validation records.
 

@@ -46,9 +46,11 @@ Run the commands below from `fastboot/`.
 .venv/bin/python pico/inject_payload.py \
   --port /dev/cu.usbmodemXXXX \
   --file prebuilt/stage1.bin \
-  --duration 15 --record-gap 0.002
+  --duration 15 --record-gap 0.002 --countdown 5
 ```
 
+- The countdown starts only after Pico identity and idle-state validation.
+- `NOW: stage1 injection` is the exact injection boundary.
 - Within 30 seconds of injection, move the camera USB-C from the Pico to the
   computer.
 - Confirm the device appears:

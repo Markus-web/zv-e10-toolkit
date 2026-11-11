@@ -15,6 +15,7 @@ import zlib
 from pathlib import Path
 
 from pico_link import Link
+from operator_timing import countdown
 
 VERSION = b'zve10_uart_od 15'
 V = 0x8CB102DC
@@ -51,7 +52,7 @@ def idle(status):
 
 
 def run(port, payload, payload_name='', duration=90, record_gap=0.0144, group_gap=0.05,
-        reset_delay=0.1, reset=True, max_groups=0):
+        reset_delay=0.1, reset=True, max_groups=0, countdown_seconds=0):
     records = make_records(payload)
     result = {'port': port, 'firmware': VERSION.decode(),
               'payload_file': payload_name,
@@ -63,6 +64,7 @@ def run(port, payload, payload_name='', duration=90, record_gap=0.0144, group_ga
               'group_bytes': sum(len(r) for r in records),
               'record_gap_s': record_gap, 'group_gap_s': group_gap,
               'reset_delay_s': reset_delay, 'reset': reset,
+              'countdown_s': countdown_seconds,
               'groups': [], 'resets': 1 if reset else 0}
     link = None
     try:
@@ -73,6 +75,7 @@ def run(port, payload, payload_name='', duration=90, record_gap=0.0144, group_ga
         if not idle(result['before']):
             raise RuntimeError('Pico must be idle input without pulls')
 
+        countdown(countdown_seconds, 'NOW: stage1 injection')
         link.exchange(3, b'\x01')
         if reset:
             link.exchange(2)          # GP27 reset pulse
@@ -125,9 +128,13 @@ if __name__ == '__main__':
     parser.add_argument('--reset-delay', type=float, default=0.1)
     parser.add_argument('--groups', type=int, default=0,
                         help='stop after N groups (default: until --duration)')
+    parser.add_argument('--countdown', type=int, default=0, metavar='SECONDS',
+                        help='operator-visible delay before reset and injection')
     parser.add_argument('--no-reset', action='store_true',
                         help='cold-boot method: no reset pulse')
     args = parser.parse_args()
+    if args.countdown < 0:
+        parser.error('--countdown must be non-negative')
 
     payload_path = Path(args.file)
     data = payload_path.read_bytes()
@@ -136,4 +143,5 @@ if __name__ == '__main__':
     if len(data) > 8192:
         print(f'WARNING: {len(data)} B exceeds the measured 8 KB direct limit')
     run(args.port, data, str(payload_path), args.duration, args.record_gap, args.group_gap,
-        args.reset_delay, reset=not args.no_reset, max_groups=args.groups)
+        args.reset_delay, reset=not args.no_reset, max_groups=args.groups,
+        countdown_seconds=args.countdown)

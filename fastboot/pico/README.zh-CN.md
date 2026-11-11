@@ -24,8 +24,11 @@ arduino-cli compile --fqbn rp2040:rp2040:rpipico \
 ```sh
 .venv/bin/python pico/inspect_pico.py --port /dev/cu.usbmodemXXXX
 .venv/bin/python pico/inject_payload.py --port /dev/cu.usbmodemXXXX \
-  --file prebuilt/stage1.bin --duration 15 --record-gap 0.002
+  --file prebuilt/stage1.bin --duration 15 --record-gap 0.002 --countdown 5
+.venv/bin/python pico/reset_only.py --port /dev/cu.usbmodemXXXX \
+  --countdown 5
 ```
 
-串口名替换为实际设备。注入工具会检查固件版本、空闲状态和开漏配置。
+串口名替换为实际设备。注入工具会先检查固件版本、空闲状态和开漏配置，再开始倒计时。
+仅复位命令也提供相同的明确操作时间点，便于观察相机屏幕。
 线序与换线时机见硬件说明；记录格式见 [协议](PROTOCOL.md)。

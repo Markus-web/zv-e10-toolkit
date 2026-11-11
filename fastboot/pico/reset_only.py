@@ -5,6 +5,7 @@ removing the battery. Requires the v15 firmware.
 """
 import argparse
 from pico_link import Link
+from operator_timing import countdown
 
 VERSION = b'zve10_uart_od 15'
 
@@ -12,13 +13,18 @@ VERSION = b'zve10_uart_od 15'
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', required=True)
+    parser.add_argument('--countdown', type=int, default=0, metavar='SECONDS',
+                        help='operator-visible delay before the reset pulse')
     args = parser.parse_args()
+    if args.countdown < 0:
+        parser.error('--countdown must be non-negative')
 
     link = Link(args.port)
     try:
         if link.exchange(1) != VERSION:
             raise RuntimeError('Unexpected firmware (need zve10_uart_od 15)')
         print('before:', link.status(), flush=True)
+        countdown(args.countdown, 'NOW: reset pulse')
         link.exchange(2)
         print('RESET PULSED. Carrier is off; the camera should boot normally.',
               flush=True)

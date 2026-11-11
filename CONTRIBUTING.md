@@ -21,7 +21,8 @@ sh -n scripts/*.sh
 ```
 
 This checks release payload hashes and capabilities, C partition/eMMC/fastboot
-logic with undefined-behavior sanitization, Python USB protocol handling,
+logic with undefined-behavior sanitization, Pico operator timing, Python USB
+protocol handling,
 and the Linux slice-report-to-recovery preparation flow. It also checks that
 invalid backup data stops recovery before any device access. Tests need no
 camera, Pico, Sony-PMCA-RE checkout or Python USB packages.

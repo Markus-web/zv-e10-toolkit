@@ -55,7 +55,7 @@ macOS 可用 Homebrew 安装 `libusb` 和 `android-platform-tools`。
 # 1. 相机接 Pico 转接板，装电池、开关 ON；替换串口名
 .venv/bin/python pico/inject_payload.py \
   --port /dev/cu.usbmodemXXXX --file prebuilt/stage1.bin \
-  --duration 15 --record-gap 0.002
+  --duration 15 --record-gap 0.002 --countdown 5
 
 # 2. payload 启动后 30 秒内，将相机 USB 换接电脑
 
@@ -68,6 +68,9 @@ fastboot getvar all
 fastboot oem partition
 fastboot fetch nflasha10 backup.bin
 ```
+
+倒计时只会在 Pico 身份与安全空闲状态检查通过后开始。以
+`NOW: stage1 injection` 为操作边界；此时相机必须接 Pico 转接板，不能接普通电脑线。
 
 内存访问命令见[内存与分区读取说明](docs/exploration.zh-CN.md)。
 `host/backup_compare.py` 可将读取结果与自己的备份分区清单比较。

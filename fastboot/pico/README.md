@@ -24,9 +24,13 @@ source header for the sketch.
 ```sh
 .venv/bin/python pico/inspect_pico.py --port /dev/cu.usbmodemXXXX
 .venv/bin/python pico/inject_payload.py --port /dev/cu.usbmodemXXXX \
-  --file prebuilt/stage1.bin --duration 15 --record-gap 0.002
+  --file prebuilt/stage1.bin --duration 15 --record-gap 0.002 --countdown 5
+.venv/bin/python pico/reset_only.py --port /dev/cu.usbmodemXXXX \
+  --countdown 5
 ```
 
 Replace the serial port. Injection checks the firmware version, idle state and
-open-drain configuration. See wiring for connections and handoff timing, and
+open-drain configuration before the countdown starts. The reset-only command
+provides the same visible action boundary for camera-screen observation. See
+wiring for connections and handoff timing, and
 [the protocol](PROTOCOL.md) for record encoding.

@@ -12,6 +12,7 @@ check:
 	$(PYTHON) -B tools/check_abi.py
 
 test: check
+	PYTHONPATH=pico $(PYTHON) -B -m unittest discover -s pico/tests -v
 	$(MAKE) -C stage2 test
 
 clean:

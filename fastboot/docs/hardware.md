@@ -48,6 +48,29 @@ USB-C male plug (24-pin breakout, both A and B sides exposed)
 
 Note: **if A6/A7 do not work, try B6/B7.**
 
+## Exact physical connections
+
+With the Pico component side facing up and Micro-USB at the top, use the right
+header edge:
+
+| Pico physical pin | Board label | Breakout connection |
+|---:|---|---|
+| 40, first from top | `VBUS` | A4 `VBUS` |
+| 38, third from top | `GND` | A1 `GND` |
+| 34, seventh from top | `GP28` | A7 `D−` |
+| 32, ninth from top | `GP27` | 470Ω, then A6 `D+` |
+
+With the breakout labels facing up and its USB-C plug at the top, the right
+column runs A12 at the top to A1 at the bottom. Therefore A7, A6, A5, A4 and A1
+are respectively the seventh, sixth, fifth, fourth and first round pads counted
+upward from the bottom. The left column runs B1 at the top to B12 at the bottom;
+B5 is the fifth round pad from the top. Bridge A5 to B5, then use one 5.1kΩ
+resistor from that shared node to A1 ground. Leave every other pad disconnected.
+
+Do not mix sides. The fallback replaces the complete A6/A7 pair with B6/B7:
+GP27 goes through 470Ω to B6 D+, and GP28 goes directly to B7 D−. It does not
+connect both pairs or combine A6 with B7.
+
 ## Notes
 
 - The camera side is a USB-C receptacle; a male 24-pin breakout is required
@@ -86,6 +109,41 @@ the passive continuity checks first.
   camera, then replays the record group.
 - **No battery removal is needed with reset.** Removing the battery to cold-boot
   is the legacy v7 method and is not used now.
+
+### Operator-visible reset test
+
+The camera's normal unsupported-accessory sequence is `USB Mode`, followed a
+few seconds later by `Check the connected device`. That transition happens
+without a Pico command and is not evidence that reset worked.
+
+For an unambiguous test, connect the camera to the breakout, not its normal PC
+cable, and wait until `Check the connected device` is steady. Then run:
+
+```sh
+.venv/bin/python pico/reset_only.py \
+  --port /dev/cu.usbmodemXXXX --countdown 5
+```
+
+A successful reset means the already-steady warning disappears and the screen
+goes black exactly at `NOW: reset pulse`. If the warning stays visible, stop
+repeating commands and recheck the complete GP27-to-D+ path with power removed.
+
+## Linux breadboard bring-up, 2026-11-11
+
+The purchased Pico H and passive parts passed these pre-camera checks:
+
+- sender firmware `zve10_uart_od 15`, open-drain build and safe idle state;
+- 466-468Ω measured for the reset resistor and 4.99kΩ for the CC resistor;
+- 4.90 V measured from A4 VBUS to A1 ground with the camera disconnected;
+- the 7,636-byte stage1 formed five records and repeated complete groups through
+  the Pico transport, returning the Pico to safe idle;
+- direct computer USB enumerated the camera normally in mass-storage mode.
+
+The breadboard adapter did **not** produce the stage1 long flash or a fastboot
+device during this session. Reset observations were confounded by the camera's
+natural screen sequence and changing breadboard contacts. This is an incomplete
+adapter bring-up, not new fastboot hardware validation. No eMMC, SD or OTP write
+was attempted. Runtime logs and device identifiers remain private and ignored.
 
 ## Switching the cable to the PC
 

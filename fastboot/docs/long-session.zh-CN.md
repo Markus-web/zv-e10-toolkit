@@ -42,9 +42,11 @@ fastboot 会一直保持，直到主动重启或断电，标准 fastboot 命令�
 .venv/bin/python pico/inject_payload.py \
   --port /dev/cu.usbmodemXXXX \
   --file prebuilt/stage1.bin \
-  --duration 15 --record-gap 0.002
+  --duration 15 --record-gap 0.002 --countdown 5
 ```
 
+- 倒计时只在 Pico 身份和空闲状态检查通过后开始；
+- `NOW: stage1 injection` 是注入开始的准确时间点；
 - 注入开始后，在 30 秒内把相机 USB-C 从 Pico 移到电脑；
 - 确认设备出现：
 

@@ -60,7 +60,7 @@ fingerprint the running stage1 before handing over to stage2.
 # 1. Camera connected to Pico breakout, battery installed, power switch ON
 .venv/bin/python pico/inject_payload.py \
   --port /dev/cu.usbmodemXXXX --file prebuilt/stage1.bin \
-  --duration 15 --record-gap 0.002
+  --duration 15 --record-gap 0.002 --countdown 5
 
 # 2. Within 30 seconds of payload startup, move camera USB to the computer
 
@@ -73,6 +73,10 @@ fastboot getvar all
 fastboot oem partition
 fastboot fetch nflasha10 backup.bin
 ```
+
+The countdown begins only after the Pico identity and safe idle state pass.
+Treat `NOW: stage1 injection` as the action boundary. The camera must be on the
+Pico breakout at that point, not on its normal computer cable.
 
 See [exploration](docs/exploration.md) for memory access.
 `host/backup_compare.py` compares reads with your backup's
